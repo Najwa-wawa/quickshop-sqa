@@ -13,19 +13,6 @@
 
 ---
 
-## 🚀 Cara Menjalankan Aplikasi
-1. Buka folder proyek:
-   ```
-   C:\Users\ASUS\.gemini\antigravity\scratch\sqa-shop-app
-   ```
-2. **Menjalankan Toko Web**:
-   - Klik ganda pada file `index.html` di File Explorer, atau klik kanan -> *Open with* -> Google Chrome / Microsoft Edge.
-3. **Menjalankan Unit Test Runner (Modul 4 White-Box Testing)**:
-   - Klik ganda pada file `test-runner.html` di browser Anda, atau klik tombol **"🧪 Buka In-Browser Test Runner"** di bar atas toko web.
-   - Anda akan melihat seluruh kasus uji BVA, EP, Decision Table, dan State Transition berjalan hijau (Passed) secara otomatis.
-
----
-
 ## 🎯 8 Fitur yang Diuji (Customer Role)
 
 ### 3 Fitur Autentikasi Wajib:
@@ -79,11 +66,3 @@ sqa-shop-app/
     ├── RISK-REGISTER.md         # Analisis 6 risiko (Impact x Likelihood = Priority)
     └── PROJECT-READINESS-CHECKLIST.md # Checklist 13 butir kesiapan (PRJ-1 s.d REQ-1)
 ```
-
----
-
-## 📋 Dokumen Praktikum Modul 1 SQA
-Di dalam folder `docs/`, Anda dapat menemukan berkas pendukung untuk pengisian lembar kerja & spreadsheet praktikum:
-1. `ISO-29119-3-TEST-PLAN.md`: Rencana pengujian lengkap sesuai format ISO/IEC/IEEE 29119-3.
-2. `RISK-REGISTER.md`: Daftar 6 risiko produk & proyek beserta skor prioritas dan mitigasi.
-3. `PROJECT-READINESS-CHECKLIST.md`: Penjelasan 13 butir kesiapan proyek yang semuanya berstatus **TRUE**.
