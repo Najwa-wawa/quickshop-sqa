@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickShop - Belanja Online Mudah & Terpercaya</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="role-banner">
+    <div class="container role-banner-content">
+      <div>
+        <span>🎉 Promo Spesial: Gunakan voucher <strong>DISKON10</strong> atau <strong>HEMAT50K</strong> saat checkout!</span>
+      </div>
+      <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <button class="btn btn-sm btn-outline" id="btn-reset-db" data-cy="reset-db-btn" title="Kembalikan data produk ke pengaturan toko">
+          🔄 Muat Ulang Data Toko
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="brand" data-cy="brand-logo">
+        <span>🛍️ QuickShop</span>
+        <span class="brand-badge">OFFICIAL</span>
+      </a>
+
+      <div class="nav-actions">
+        <!-- Cart Button -->
+        <button class="btn-icon" id="btn-open-cart" data-cy="cart-button" title="Keranjang Belanja">
+          🛒
+          <span class="badge-counter" id="cart-counter" data-cy="cart-counter">0</span>
+        </button>
+
+        <!-- User Auth Status / Nav Buttons -->
+        <div id="nav-user-guest" class="nav-actions">
+          <button class="btn btn-outline btn-sm" id="btn-show-login" data-cy="login-nav-btn">Masuk</button>
+          <button class="btn btn-primary btn-sm" id="btn-show-register" data-cy="register-nav-btn">Daftar</button>
+        </div>
+
+        <div id="nav-user-logged" class="nav-actions" style="display: none;">
+          <span style="font-size: 0.85rem; font-weight: 600;" id="nav-user-name" data-cy="nav-user-name">Budi Santoso</span>
+          <button class="btn btn-outline btn-sm" id="btn-logout" data-cy="logout-nav-btn">Keluar</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="app-tabs">
+    <div class="container">
+      <ul class="tab-list">
+        <li class="tab-item active" data-tab="catalog" data-cy="tab-catalog">📦 Katalog Produk</li>
+        <li class="tab-item" data-tab="orders" data-cy="tab-orders">🧾 Pesanan Saya <span id="orders-badge" class="badge badge-info" style="display:none; margin-left: 4px;">0</span></li>
+        <li class="tab-item" data-tab="profile" data-cy="tab-profile">👤 Profil Pelanggan</li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="container main-content">
+
+    <!-- ==========================================
+         TAB 1: PRODUCT CATALOG (Search, Filter, BVA)
+         ========================================== -->
+    <section id="view-catalog" class="tab-content">
+      <!-- Search & Filters -->
+      <div class="filter-bar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="search-input" data-cy="search-input" placeholder="Cari nama produk, spesifikasi...">
+        </div>
+        <div class="filter-group">
+          <select id="filter-category" data-cy="category-filter">
+            <option value="ALL">Semua Kategori</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Wearables">Wearables</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Lifestyle">Lifestyle</option>
+          </select>
+          <select id="filter-sort" data-cy="sort-filter">
+            <option value="default">Urutkan: Default</option>
+            <option value="price-asc">Harga: Termurah</option>
+            <option value="price-desc">Harga: Termahal</option>
+            <option value="rating-desc">Rating Tertinggi</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="product-grid" id="products-container" data-cy="product-grid">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 2: ORDER HISTORY & STATUS TRANSITION
+         ========================================== -->
+    <section id="view-orders" class="tab-content" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <h2>Riwayat Pesanan Pelanggan</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">
+            Daftar transaksi belanja dan pelacakan status pengiriman barang Anda.
+          </p>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-responsive">
+          <table data-cy="orders-table">
+            <thead>
+              <tr>
+                <th>No. Order</th>
+                <th>Tanggal</th>
+                <th>Rincian Produk</th>
+                <th>Total Bayar</th>
+                <th>Status Pesanan</th>
+                <th>Aksi Pelanggan</th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody" data-cy="orders-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 3: CUSTOMER PROFILE & INFO
+         ========================================== -->
+    <section id="view-profile" class="tab-content" style="display: none;">
+      <div style="max-width: 600px; margin: 0 auto; background: white; padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border);">
+        <h2 style="margin-bottom: 1.5rem;">Informasi Akun Pelanggan</h2>
+        <form id="form-update-profile" data-cy="profile-form">
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap</label>
+            <input type="text" id="prof-name" class="form-control" data-cy="profile-name-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email (Akun Utama)</label>
+            <input type="email" id="prof-email" class="form-control" data-cy="profile-email-input" disabled style="background:#f1f5f9;">
+            <div class="form-help">Email digunakan sebagai ID akun pelanggan.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nomor Telepon / WhatsApp</label>
+            <input type="tel" id="prof-phone" class="form-control" data-cy="profile-phone-input" required>
+            <div id="prof-phone-err" class="form-error"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Alamat Pengiriman Default</label>
+            <textarea id="prof-address" class="form-control" rows="3" data-cy="profile-address-input"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" data-cy="profile-save-btn">💾 Simpan Perubahan Profil</button>
+        </form>
+
+        <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">
+
+        <h3>Ganti Password</h3>
+        <form id="form-change-password" data-cy="change-password-form" style="margin-top: 1rem;">
+          <div class="form-group">
+            <label class="form-label">Password Saat Ini</label>
+            <input type="password" id="cp-current" class="form-control" data-cy="cp-current-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password Baru (min. 8 karakter)</label>
+            <input type="password" id="cp-new" class="form-control" data-cy="cp-new-input" required>
+            <div id="cp-new-err" class="form-error"></div>
+          </div>
+          <button type="submit" class="btn btn-outline" data-cy="change-password-btn">🔑 Perbarui Password</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================
+       MODAL 1: SHOPPING CART (CRUD)
+       ========================================== -->
+  <div class="modal-overlay" id="modal-cart">
+    <div class="modal-box modal-box-lg">
+      <div class="modal-header">
+        <h3>🛒 Keranjang Belanja Anda</h3>
+        <button class="modal-close" data-close-modal="modal-cart">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="cart-items-container" data-cy="cart-items-container">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <button class="btn btn-outline btn-sm" id="btn-clear-cart" data-cy="clear-cart-btn">🗑️ Kosongkan Keranjang</button>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="text-align: right;">
+            <div style="font-size: 0.775rem; color: var(--text-muted);">Subtotal Barang:</div>
+            <div style="font-size: 1.15rem; font-weight: 800; color: #047857;" id="cart-subtotal-display" data-cy="cart-subtotal">Rp 0</div>
+          </div>
+          <button class="btn btn-primary" id="btn-open-checkout" data-cy="checkout-btn">Lanjut ke Checkout ➔</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 2: CHECKOUT & VOUCHER LOGIC (Decision Table, BVA)
+       ========================================== -->
+  <div class="modal-overlay" id="modal-checkout">
+    <div class="modal-box modal-box-lg">
+      <div class="modal-header">
+        <h3>💳 Checkout & Pembayaran</h3>
+        <button class="modal-close" data-close-modal="modal-checkout">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;" class="checkout-grid">
+          <div>
+            <h4 style="margin-bottom: 0.75rem;">1. Informasi Pengiriman</h4>
+            <div class="form-group">
+              <label class="form-label">Nama Penerima</label>
+              <input type="text" id="co-name" class="form-control" data-cy="checkout-name" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Alamat Lengkap</label>
+              <textarea id="co-address" class="form-control" rows="2" data-cy="checkout-address" required></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Kota Tujuan</label>
+              <select id="co-city" class="form-control" data-cy="checkout-city">
+                <option value="Malang">Malang (Jawa Timur) - Tarif Lokal</option>
+                <option value="Surabaya">Surabaya / Sidoarjo</option>
+                <option value="Jakarta">DKI Jakarta / Bandung / Semarang</option>
+                <option value="Luar Jawa">Luar Pulau Jawa</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Layanan Pengiriman</label>
+              <select id="co-courier" class="form-control" data-cy="checkout-courier">
+                <option value="reguler">Reguler (Standard)</option>
+                <option value="express">Express (Kilat 1 Hari)</option>
+                <option value="same-day">Same Day Service</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Metode Pembayaran</label>
+              <select id="co-payment-method" class="form-control" data-cy="checkout-payment-method">
+                <option value="Bank Transfer (BCA)">Bank Transfer BCA (Virtual Account)</option>
+                <option value="Bank Transfer (Mandiri)">Bank Transfer Mandiri</option>
+                <option value="QRIS Instant Pay">QRIS Digital Payment</option>
+                <option value="Cash On Delivery">COD (Bayar di Tempat)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <h4 style="margin-bottom: 0.75rem;">2. Ringkasan & Voucher Promo</h4>
+            <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem;">
+              <label class="form-label">Kupon / Voucher Promo</label>
+              <div style="display: flex; gap: 0.5rem;">
+                <input type="text" id="co-voucher-input" class="form-control" placeholder="DISKON10 / HEMAT50K" data-cy="voucher-input" style="text-transform: uppercase;">
+                <button type="button" class="btn btn-outline btn-sm" id="btn-apply-voucher" data-cy="apply-voucher-btn">Terapkan</button>
+              </div>
+              <div class="form-help">Coba kode voucher: <code>DISKON10</code>, <code>HEMAT50K</code>, atau <code>GRATISONGKIR</code></div>
+              <div id="co-voucher-msg" data-cy="voucher-message" style="margin-top: 0.5rem; font-size: 0.8rem; font-weight: 600;"></div>
+            </div>
+
+            <!-- Billing Breakdown -->
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                <span>Subtotal Produk:</span>
+                <span id="co-subtotal" data-cy="checkout-subtotal">Rp 0</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                <span>Ongkos Kirim:</span>
+                <span id="co-shipping-cost" data-cy="shipping-cost">Rp 0</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem; color: #dc2626;">
+                <span>Diskon Promo:</span>
+                <span id="co-discount-amount" data-cy="discount-amount">- Rp 0</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem; color: #dc2626;">
+                <span>Diskon Ongkir:</span>
+                <span id="co-shipping-discount" data-cy="shipping-discount">- Rp 0</span>
+              </div>
+              <hr style="margin: 0.75rem 0; border: none; border-top: 1px dashed var(--border);">
+              <div style="display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: 800;">
+                <span>Total Pembayaran:</span>
+                <span id="co-total-payment" data-cy="total-payment" style="color: #047857;">Rp 0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-close-modal="modal-checkout">Batal</button>
+        <button class="btn btn-primary" id="btn-submit-order" data-cy="place-order-btn">🚀 Buat Pesanan Sekarang</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 3: LOGIN FORM (Auth Feature 1)
+       ========================================== -->
+  <div class="modal-overlay" id="modal-login">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>🔐 Masuk Akun Customer</h3>
+        <button class="modal-close" data-close-modal="modal-login">&times;</button>
+      </div>
+      <form id="form-login" data-cy="login-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Email Pelanggan</label>
+            <input type="email" id="login-email" class="form-control" data-cy="login-email-input" placeholder="customer@quickshop.id" required>
+            <div id="login-email-err" class="form-error"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="login-password" class="form-control" data-cy="login-password-input" placeholder="••••••••" required>
+            <div id="login-pass-err" class="form-error"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.825rem;">
+            <label style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+              <input type="checkbox" id="login-remember" checked> Ingat saya
+            </label>
+            <a href="#" id="link-forgot-password" data-cy="forgot-password-link" style="color: var(--primary); text-decoration: none;">Lupa Password?</a>
+          </div>
+          <div class="form-help" style="margin-top: 1rem; background: #eff6ff; padding: 0.5rem; border-radius: 4px;">
+            💡 <strong>Akun Demo:</strong> <code>customer@quickshop.id</code> | Password: <code>Password123!</code>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="btn-switch-to-register">Belum punya akun? Daftar</button>
+          <button type="submit" class="btn btn-primary" data-cy="login-submit-btn">Masuk</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 4: REGISTER FORM (Auth Feature 2)
+       ========================================== -->
+  <div class="modal-overlay" id="modal-register">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>📝 Registrasi Akun Customer Baru</h3>
+        <button class="modal-close" data-close-modal="modal-register">&times;</button>
+      </div>
+      <form id="form-register" data-cy="register-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap</label>
+            <input type="text" id="reg-name" class="form-control" data-cy="register-name-input" placeholder="Nama Anda" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Alamat Email</label>
+            <input type="email" id="reg-email" class="form-control" data-cy="register-email-input" placeholder="nama@email.com" required>
+            <div id="reg-email-err" class="form-error"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nomor WhatsApp / HP</label>
+            <input type="tel" id="reg-phone" class="form-control" data-cy="register-phone-input" placeholder="081234567890" required>
+            <div id="reg-phone-err" class="form-error"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password (Min. 8 Karakter)</label>
+            <input type="password" id="reg-password" class="form-control" data-cy="register-password-input" placeholder="Kombinasi huruf besar & angka" required>
+            <div id="reg-pass-err" class="form-error"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Konfirmasi Password</label>
+            <input type="password" id="reg-confirm" class="form-control" data-cy="register-confirm-input" placeholder="Ulangi password" required>
+            <div id="reg-confirm-err" class="form-error"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="btn-switch-to-login">Sudah ada akun? Masuk</button>
+          <button type="submit" class="btn btn-primary" data-cy="register-submit-btn">Daftar Sekarang</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 5: FORGOT & RESET PASSWORD (Auth Feature 3)
+       ========================================== -->
+  <div class="modal-overlay" id="modal-forgot">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>🔑 Lupa & Reset Password</h3>
+        <button class="modal-close" data-close-modal="modal-forgot">&times;</button>
+      </div>
+
+      <!-- Step 1: Request Reset Token -->
+      <div id="forgot-step-1">
+        <form id="form-forgot-request" data-cy="forgot-request-form">
+          <div class="modal-body">
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+              Masukkan email terdaftar Anda untuk menerima kode OTP verifikasi reset password.
+            </p>
+            <div class="form-group">
+              <label class="form-label">Email Terdaftar</label>
+              <input type="email" id="forgot-email" class="form-control" data-cy="forgot-email-input" placeholder="customer@quickshop.id" required>
+              <div id="forgot-email-err" class="form-error"></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" data-close-modal="modal-forgot">Batal</button>
+            <button type="submit" class="btn btn-primary" data-cy="forgot-submit-btn">Kirim Kode Reset</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Step 2: Input OTP & Set New Password -->
+      <div id="forgot-step-2" style="display: none;">
+        <form id="form-forgot-reset" data-cy="forgot-reset-form">
+          <div class="modal-body">
+            <div style="background: #ecfdf5; border: 1px solid #a7f3d0; padding: 0.75rem; border-radius: var(--radius); margin-bottom: 1rem; font-size: 0.85rem; color: #065f46;">
+              Kode Verifikasi OTP Anda: <strong id="display-otp-code" data-cy="otp-code-badge" style="font-size: 1.1rem; letter-spacing: 2px;"></strong>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Masukkan Kode OTP</label>
+              <input type="text" id="reset-otp-input" class="form-control" data-cy="reset-otp-input" placeholder="6 digit kode OTP" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password Baru (min. 8 karakter)</label>
+              <input type="password" id="reset-new-password" class="form-control" data-cy="reset-new-password" placeholder="••••••••" required>
+              <div id="reset-pass-err" class="form-error"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ulangi Password Baru</label>
+              <input type="password" id="reset-confirm-password" class="form-control" data-cy="reset-confirm-password" placeholder="••••••••" required>
+              <div id="reset-confirm-err" class="form-error"></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" data-cy="reset-submit-btn">💾 Simpan Password Baru</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 6: PRODUCT REVIEW & RATING (BVA Rating 1-5, Comment Validation)
+       ========================================== -->
+  <div class="modal-overlay" id="modal-review">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>⭐ Beri Ulasan & Rating Produk</h3>
+        <button class="modal-close" data-close-modal="modal-review">&times;</button>
+      </div>
+      <form id="form-review" data-cy="review-form">
+        <div class="modal-body">
+          <input type="hidden" id="rev-product-id">
+          <input type="hidden" id="rev-order-id">
+          <div class="form-group">
+            <label class="form-label">Produk yang Diulas</label>
+            <input type="text" id="rev-product-name" class="form-control" disabled style="background:#f1f5f9;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Rating Bintang (Boundary Value: 1 s.d 5 Bintang)</label>
+            <select id="rev-rating" class="form-control" data-cy="review-rating-select" required>
+              <option value="5">⭐⭐⭐⭐⭐ (5 - Sangat Puas)</option>
+              <option value="4">⭐⭐⭐⭐ (4 - Bagus)</option>
+              <option value="3">⭐⭐⭐ (3 - Cukup)</option>
+              <option value="2">⭐⭐ (2 - Kurang Puas)</option>
+              <option value="1">⭐ (1 - Kecewa)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ulasan / Testimoni Anda (10 - 500 Karakter)</label>
+            <textarea id="rev-comment" class="form-control" rows="4" data-cy="review-comment-textarea" placeholder="Bagaimana pengalaman Anda memakai produk ini? Tulis minimal 10 karakter..." required></textarea>
+            <div id="rev-comment-err" class="form-error"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" data-close-modal="modal-review">Batal</button>
+          <button type="submit" class="btn btn-primary" data-cy="submit-review-btn">Kirim Ulasan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <strong>QuickShop</strong> &copy; 2026. Hak Cipta Dilindungi. Platform Belanja Online Terpercaya.
+      </div>
+      <div>
+        <span>Layanan Bantuan Pelanggan: support@quickshop.id</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/data/mockData.js"></script>
+  <script src="js/logic/validationLogic.js"></script>
+  <script src="js/logic/discountLogic.js"></script>
+  <script src="js/logic/cartLogic.js"></script>
+  <script src="js/logic/orderStateLogic.js"></script>
+  <script src="js/services/storageService.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

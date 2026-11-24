@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickShop - In-Browser Visual Test Runner (White-Box & Black-Box)</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .runner-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .test-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 0.5rem;
+      background: #f8fafc;
+      border-left: 4px solid #94a3b8;
+      font-size: 0.875rem;
+    }
+    .test-item.pass {
+      border-left-color: var(--success);
+      background: #f0fdf4;
+    }
+    .test-item.fail {
+      border-left-color: var(--danger);
+      background: #fef2f2;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-box {
+      background: white;
+      padding: 1.25rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-top: 0.35rem;
+    }
+  </style>
+</head>
+<body style="background: #f8fafc; padding-bottom: 3rem;">
+
+  <!-- Header -->
+  <header style="background: white; border-bottom: 1px solid var(--border); padding: 1.25rem 0;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--dark);">🧪 QuickShop - Interactive Unit Test Runner</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">
+          Suite Pengujian Unit & Logika Bisnis Otomatis (Boundary Values, Input Validation, Rules & State Transitions)
+        </p>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <button class="btn btn-primary" id="btn-run-tests">▶ Jalankan Ulang Semua Tes</button>
+        <a href="index.html" class="btn btn-outline">⬅ Kembali ke Toko Web</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="margin-top: 1.5rem;">
+    <!-- Stats Row -->
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Total Test Cases</div>
+        <div class="stat-number" id="stat-total" style="color: var(--primary);">0</div>
+      </div>
+      <div class="stat-box">
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Passed</div>
+        <div class="stat-number" id="stat-pass" style="color: var(--success);">0</div>
+      </div>
+      <div class="stat-box">
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Failed</div>
+        <div class="stat-number" id="stat-fail" style="color: var(--danger);">0</div>
+      </div>
+      <div class="stat-box">
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Waktu Eksekusi</div>
+        <div class="stat-number" id="stat-time" style="color: #6366f1;">0 ms</div>
+      </div>
+    </div>
+
+    <!-- Test Suites Container -->
+    <div id="suites-container"></div>
+  </main>
+
+  <!-- Load Code Modules & Tests -->
+  <script src="js/logic/validationLogic.js"></script>
+  <script src="js/logic/discountLogic.js"></script>
+  <script src="js/logic/cartLogic.js"></script>
+  <script src="js/logic/orderStateLogic.js"></script>
+  <script src="tests/unitTests.js"></script>
+
+  <script>
+    function runSuites() {
+      const container = document.getElementById("suites-container");
+      container.innerHTML = "";
+
+      let totalCount = 0;
+      let passCount = 0;
+      let failCount = 0;
+
+      const startTime = performance.now();
+
+      testSuites.forEach((suite, sIdx) => {
+        const card = document.createElement("div");
+        card.className = "runner-card";
+
+        const header = document.createElement("div");
+        header.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;";
+        header.innerHTML = `
+          <h3 style="font-size: 1.05rem; font-weight: 700;">${suite.name}</h3>
+          <span class="badge badge-info">${suite.tests.length} Kasus Uji</span>
+        `;
+        card.appendChild(header);
+
+        suite.tests.forEach((t) => {
+          totalCount++;
+          let passed = false;
+          let detailMsg = "";
+
+          try {
+            const res = t.fn();
+            passed = !!res.pass;
+            detailMsg = res.details || "";
+          } catch (err) {
+            passed = false;
+            detailMsg = "Error: " + err.message;
+          }
+
+          if (passed) passCount++;
+          else failCount++;
+
+          const row = document.createElement("div");
+          row.className = `test-item ${passed ? "pass" : "fail"}`;
+          row.innerHTML = `
+            <div>
+              <div style="font-weight: 600;">${passed ? "✔" : "✖"} ${t.description}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">${detailMsg}</div>
+            </div>
+            <span class="badge ${passed ? "badge-success" : "badge-danger"}">${passed ? "PASSED" : "FAILED"}</span>
+          `;
+          card.appendChild(row);
+        });
+
+        container.appendChild(card);
+      });
+
+      const endTime = performance.now();
+      const elapsedMs = Math.round(endTime - startTime);
+
+      document.getElementById("stat-total").textContent = totalCount;
+      document.getElementById("stat-pass").textContent = passCount;
+      document.getElementById("stat-fail").textContent = failCount;
+      document.getElementById("stat-time").textContent = `${elapsedMs} ms`;
+    }
+
+    document.getElementById("btn-run-tests").addEventListener("click", runSuites);
+    window.addEventListener("DOMContentLoaded", runSuites);
+  </script>
+</body>
+</html>
