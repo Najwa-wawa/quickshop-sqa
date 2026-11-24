@@ -1,0 +1,21 @@
+{
+  "name": "quickshop-sqa",
+  "version": "1.0.0",
+  "description": "QuickShop SQA Storefront - Web Testing Project for UMM Informatics Practicum",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test tests/allFeatures.test.js",
+    "test:coverage": "node --test --experimental-test-coverage tests/allFeatures.test.js",
+    "test:shipping": "node --test tests/shipping.test.js"
+  },
+  "keywords": [
+    "sqa",
+    "testing",
+    "iso-29119",
+    "bva",
+    "equivalence-partitioning"
+  ],
+  "author": "Informatics Student",
+  "license": "ISC"
+}
