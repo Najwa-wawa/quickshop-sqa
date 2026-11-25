@@ -59,10 +59,4 @@ sqa-shop-app/
 │       └── storageService.js    # LocalStorage manager & tombol reset seed data
 │
 ├── tests/
-│   └── unitTests.js             # Kumpulan skenario unit test otomatis
-│
-└── docs/                        # Dokumen resmi praktikum Modul 1
-    ├── ISO-29119-3-TEST-PLAN.md # Dokumen Test Plan standar ISO 29119-3
-    ├── RISK-REGISTER.md         # Analisis 6 risiko (Impact x Likelihood = Priority)
-    └── PROJECT-READINESS-CHECKLIST.md # Checklist 13 butir kesiapan (PRJ-1 s.d REQ-1)
-```
+    └── unitTests.js             # Kumpulan skenario unit test otomatis
